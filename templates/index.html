@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Matcher</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <!-- Animate.css for cool animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(120deg, #74ebd5 0%, #9face6 100%);
+      margin: 0;
+      padding: 0;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: #fff;
+      margin-top: 40px;
+      padding: 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 1100px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      animation: fadeInUp 1s ease;
+    }
+
+    h2 {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #4a4ae6;
+    }
+
+    label {
+      font-weight: 500;
+      margin-top: 15px;
+      display: inline-block;
+    }
+
+    select, textarea, input[type="file"], input[type="submit"] {
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    select:focus, textarea:focus, input[type="file"]:focus {
+      border-color: #4a4ae6;
+      outline: none;
+      box-shadow: 0 0 8px rgba(74, 74, 230, 0.3);
+    }
+
+    input[type="submit"] {
+      background: #4a4ae6;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+      background: #3737c9;
+      transform: translateY(-2px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #4a4ae6;
+      color: #fff;
+    }
+
+    tr:hover {
+      background: #f6f8ff;
+      transition: 0.3s;
+    }
+
+    .bg-green { background-color: #d4edda; }   /* Strong Match */
+    .bg-orange { background-color: #fff3cd; }  /* Good Match */
+    .bg-red { background-color: #f8d7da; }     /* Below Threshold */
+
+    /* Smooth fade in animation */
+    @keyframes fadeInUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container animate__animated animate__fadeIn">
+    <h2>🚀 Resume Matcher Tool</h2>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <!-- JD Dropdown -->
+      <label for="jobRole">Select Job Role:</label>
+      <select id="jobRole" name="jobRole" onchange="fillJD()">
+        <option value="">-- Select a role --</option>
+        <option value="software_engineer">Software Engineer</option>
+        <option value="frontend_developer">Frontend Developer</option>
+        <option value="backend_developer">Backend Developer</option>
+        <option value="fullstack_developer">Full Stack Developer</option>
+        <option value="mobile_developer">Mobile App Developer</option>
+        <option value="data_scientist">Data Scientist</option>
+        <option value="ml_engineer">Machine Learning Engineer</option>
+        <option value="ai_engineer">AI Engineer</option>
+        <option value="data_engineer">Data Engineer</option>
+        <option value="devops_engineer">DevOps Engineer</option>
+        <option value="cloud_engineer">Cloud Engineer</option>
+        <option value="cybersecurity_engineer">Cybersecurity Engineer</option>
+        <option value="uiux_designer">UI/UX Designer</option>
+        <option value="qa_engineer">QA Engineer</option>
+        <option value="blockchain_developer">Blockchain Developer</option>
+        <option value="arvr_developer">AR/VR Developer</option>
+      </select>
+
+      <!-- JD Text Area -->
+      <label for="resumeText">Or paste your own Job Description:</label>
+      <textarea id="resumeText" name="resumeText" rows="12" placeholder="Paste or auto-fill the JD here..."></textarea>
+
+      <!-- Resume Upload -->
+      <label for="resumeFile">Upload Resumes (PDF/DOCX/TXT):</label>
+      <input type="file" name="resumeFile" multiple accept=".pdf,.docx,.txt">
+
+      <input type="submit" value="Match Resumes">
+    </form>
+
+    <!-- Results Section -->
+    {% if message %}
+      <h3>{{ message }}</h3>
+    {% endif %}
+
+    {% if results %}
+      <table class="animate__animated animate__fadeInUp">
+        <tr>
+          <th>S.No</th>
+          <th>Resume File</th>
+          <th>Match Score</th>
+          <th>Status</th>
+          <th>AI Suggestion</th>
+        </tr>
+        {% for r in results %}
+          <tr class="{{ r.color }}">
+            <td>{{ r.sno }}</td>
+            <td><a href="/resume/{{ r.filename }}" target="_blank">{{ r.filename }}</a></td>
+            <td>{{ r.score }}</td>
+            <td>{{ r.status }}</td>
+            <td>{{ r.suggestion }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+
+
+  </div>
+
+  <!-- Autofill JD script (same as before) -->
+  <script>
+    function fillJD() {
+      let role = document.getElementById("jobRole").value;
+      let jdBox = document.getElementById("resumeText");
+
+      if (role === "software_engineer") {
+        jdBox.value = `Job Title: Software Engineer\n\nResponsibilities:\n- Design, develop, and maintain scalable applications.\n- Collaborate with cross-functional teams.\n- Write clean, testable, and efficient code.\n\nRequirements:\n- Strong in Java, Python, or C++.\n- Good understanding of DS & Algorithms.\n- Knowledge of Git.`;
+      }
+      if (role === "frontend_developer") {
+        jdBox.value = `Job Title: Frontend Developer\n\nResponsibilities:\n- Build responsive web interfaces.\n- Optimize applications.\n- Work with designers to implement UI/UX.\n\nRequirements:\n- Proficient in HTML, CSS, JavaScript, React/Angular.\n- Experience with APIs.\n- Responsive design knowledge.`;
+      }
+      // keep all the rest of your roles here...
+    }
+  </script>
+</body>
+</html>

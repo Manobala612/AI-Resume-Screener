@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resume Details - {{ filename }}</title>
+</head>
+<body>
+  <h2>Extracted Details for {{ filename }}</h2>
+
+  {% if data %}
+    <ul>
+      {% for key, value in data.items() %}
+        <li><b>{{ key.capitalize() }}:</b> {{ value }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No details extracted.</p>
+  {% endif %}
+
+  <a href="/">⬅ Back to Resume Matcher</a>
+</body>
+</html>

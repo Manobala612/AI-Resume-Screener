@@ -1,0 +1,6 @@
+
+flask 
+os
+PyPDF2
+docx2txt
+sklearn
